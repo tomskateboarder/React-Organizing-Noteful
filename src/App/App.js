@@ -8,6 +8,13 @@ import NotePageNav from '../NotePageNav/NotePageNav';
 import NoteListMain from '../NoteListMain/NoteListMain';
 import NotePageMain from '../NotePageMain/NotePageMain';
 import dummyStore from '../dummy-store';
+import Main from '../Main';
+import MainSidebar from '../MainSidebar';
+import Note from '../Note';
+import StoreContext from '../StoreContext';
+import AddFolder from '../AddFolder';
+import AddNote from '../AddNote';
+import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 
 import {getNotesForFolder, findNote, findFolder} from '../notes-helpers';
 import './App.css';
@@ -106,7 +113,53 @@ class App extends Component {
                 <main className="App__main">{this.renderMainRoutes()}</main>
             </div>
         );
+            
+    }
+    render() {
+        return (
+          <StoreContext.Provider
+            value={{
+              folders: this.state.folders,
+              notes: this.state.notes,
+              delete: this.handleDelete,
+              newFolderName: this.setNewFolderName,
+              newFolder: this.handleAddNewFolder,
+              newNoteName: this.setNewNoteName,
+              newNoteContent: this.setNewNoteContent,
+              newNoteFolder: this.setNewNoteFolder,
+              newNote: this.handleAddNewNote
+            }}
+          >
+            <div className="App">
+              <Header />
+              <Route exact path="/" component={MainSidebar} />
+    
+              <ErrorBoundry>
+                <Route exact path="/" component={Main} />
+    
+                <Route
+                  exact
+                  path="/folder/:folderId"
+                  render={props => (
+                    <>
+                      <MainSidebar match={props.match} />
+                      <Main match={props.match} />
+                    </>
+                  )}
+                />
+                <Route exact path="/note/:noteId" component={Note} />
+              </ErrorBoundry>
+    
+              <Route exact path="/addfolder" component={AddFolder} />
+    
+              <Route exact path="/addnote" component={AddNote} />
+            </div>
+          </StoreContext.Provider>
+        );
+      }
     }
 }
+
+
 
 export default App;
